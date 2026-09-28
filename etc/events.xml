@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="paws_pet_profile_save_commit_after">
+        <observer name="paws_pet_profile_publish_saved" instance="PawsWhiskers\PetProfile\Observer\PublishPetSaved"/>
+    </event>
+    <event name="paws_pet_profile_delete_commit_after">
+        <observer name="paws_pet_profile_publish_deleted" instance="PawsWhiskers\PetProfile\Observer\PublishPetDeleted"/>
+    </event>
+</config>

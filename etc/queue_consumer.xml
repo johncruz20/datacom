@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="paws.pet_profile.sync" queue="paws.pet_profile.sync" connection="db" maxMessages="200"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="PawsWhiskers\PetProfile\Model\Queue\SyncConsumer::process"/>
+</config>

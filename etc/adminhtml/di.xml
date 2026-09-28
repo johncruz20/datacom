@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="PawsWhiskers\PetProfile\Model\ResourceModel\Pet\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="const">PawsWhiskers\PetProfile\Model\ResourceModel\Pet::TABLE_NAME</argument>
+            <argument name="resourceModel" xsi:type="string">PawsWhiskers\PetProfile\Model\ResourceModel\Pet</argument>
+            <argument name="identifierName" xsi:type="string">pet_id</argument>
+        </arguments>
+        <!--
+            Magento_Sales plugs into every SearchResult and rewrites "created_at" filters itself,
+            bypassing addFilterToMap. With the customer join that produces an ambiguous column,
+            so the plugin is switched off for this grid only. It is meant for the order grid.
+        -->
+        <plugin name="orderGridCollectionFilterPlugin" disabled="true"/>
+    </type>
+</config>

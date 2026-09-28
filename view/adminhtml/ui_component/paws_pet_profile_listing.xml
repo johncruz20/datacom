@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Read-only pet profile grid. Pets are edited by customers through the APIs. -->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">paws_pet_profile_listing.paws_pet_profile_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>paws_pet_profile_columns</spinner>
+        <deps>
+            <dep>paws_pet_profile_listing.paws_pet_profile_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="paws_pet_profile_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">pet_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>PawsWhiskers_PetProfile::pets</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="paws_pet_profile_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>pet_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="paws_pet_profile_columns">
+        <column name="pet_id" sortOrder="10">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="name" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Pet Name</label>
+            </settings>
+        </column>
+        <column name="species" component="Magento_Ui/js/grid/columns/select" sortOrder="30">
+            <settings>
+                <options class="PawsWhiskers\PetProfile\Model\Source\Species"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Species</label>
+            </settings>
+        </column>
+        <column name="breed" sortOrder="40">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Breed</label>
+            </settings>
+        </column>
+        <column name="gender" component="Magento_Ui/js/grid/columns/select" sortOrder="50">
+            <settings>
+                <options class="PawsWhiskers\PetProfile\Model\Source\Gender"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Gender</label>
+            </settings>
+        </column>
+        <column name="date_of_birth" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="60">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>MMM d, y</dateFormat>
+                <timezone>false</timezone>
+                <label translate="true">Date of Birth</label>
+            </settings>
+        </column>
+        <column name="weight_kg" sortOrder="70">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Weight (kg)</label>
+            </settings>
+        </column>
+        <column name="customer_email" sortOrder="80">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Email</label>
+            </settings>
+        </column>
+        <column name="customer_name" sortOrder="90">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Name</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="100">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created</label>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date"
+                component="Magento_Ui/js/grid/columns/date" sortOrder="110">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Updated</label>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="PawsWhiskers\PetProfile\Ui\Component\Listing\Column\PetActions"
+                       sortOrder="200">
+            <settings>
+                <indexField>pet_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

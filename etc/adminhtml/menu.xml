@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="PawsWhiskers_PetProfile::pets" title="Pet Profiles" translate="title"
+             module="PawsWhiskers_PetProfile" sortOrder="50" parent="Magento_Customer::customer"
+             action="paws_petprofile/pet/index" resource="PawsWhiskers_PetProfile::pets"/>
+    </menu>
+</config>

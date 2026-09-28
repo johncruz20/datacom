@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="magento-db" type="topic" connection="db">
+        <binding id="pawsPetProfileSyncBinding" topic="paws.pet_profile.sync"
+                 destinationType="queue" destination="paws.pet_profile.sync"/>
+    </exchange>
+</config>
