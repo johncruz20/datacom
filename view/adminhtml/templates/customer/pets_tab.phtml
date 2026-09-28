@@ -1,0 +1,49 @@
+<?php
+/**
+ * @var \PawsWhiskers\PetProfile\Block\Adminhtml\Customer\PetsTab $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$pets = $block->getPets();
+?>
+<div class="fieldset-wrapper customer-information">
+    <div class="fieldset-wrapper-title">
+        <span class="title"><?= $escaper->escapeHtml(__('Pet Profiles')) ?></span>
+    </div>
+    <?php if (!$pets): ?>
+        <div class="message message-notice">
+            <div><?= $escaper->escapeHtml(__('This customer hasn\'t added any pets yet.')) ?></div>
+        </div>
+    <?php else: ?>
+        <div class="admin__data-grid-wrap admin__data-grid-wrap-static">
+            <table class="data-grid">
+                <thead>
+                <tr>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Name')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Species')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Breed')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Gender')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Date of Birth')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Age')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Weight (kg)')) ?></th>
+                    <th class="data-grid-th"><?= $escaper->escapeHtml(__('Last Updated')) ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($pets as $pet): ?>
+                    <tr>
+                        <td><?= $escaper->escapeHtml($pet->getName()) ?></td>
+                        <td><?= $escaper->escapeHtml($block->getSpeciesLabel($pet->getSpecies())) ?></td>
+                        <td><?= $escaper->escapeHtml($pet->getBreed() ?? '') ?></td>
+                        <td><?= $escaper->escapeHtml($block->getGenderLabel($pet->getGender())) ?></td>
+                        <td><?= $escaper->escapeHtml($pet->getDateOfBirth() ?? '') ?></td>
+                        <td><?= $escaper->escapeHtml($block->getAge($pet->getDateOfBirth())) ?></td>
+                        <?php $weight = $pet->getWeightKg(); ?>
+                        <td><?= $weight === null ? '' : $escaper->escapeHtml(number_format($weight, 2)) ?></td>
+                        <td><?= $escaper->escapeHtml($pet->getUpdatedAt() ?? '') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

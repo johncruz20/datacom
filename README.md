@@ -413,6 +413,14 @@ The brief puts admin UI out of scope, so this is kept off `main`. The branch add
   `CollectionFactory` in the **global** `etc/di.xml`. An area `di.xml` would replace the whole
   `collections` array rather than merge into it, which unregisters every core admin grid.
 - **Row action:** "View Customer" opens the owner's customer page.
+- **Customer edit page tab:** a "Pet Profiles" tab on *Customers → All Customers → Edit*
+  (`view/base/ui_component/customer_form.xml` → `Block/Adminhtml/Customer/PetsTab`). It lists the
+  customer's pets with species and gender labels and a derived age. It is added as an `htmlContent`
+  block like the core Orders and Reviews tabs, and the `acl` attribute hides it from roles without
+  `PawsWhiskers_PetProfile::pets`. It reads through `CustomerPetManagementInterface::getList()`,
+  so it uses the same service contract as the storefront. It renders with the page instead of
+  loading by Ajax, because the per-customer limit keeps the list short. It is hidden on the
+  "New Customer" page.
 - **Read-only on purpose:** pets belong to customers and are edited through the customer APIs, which
   keeps validation, ownership and the marketing sync on a single write path.
 
@@ -421,4 +429,4 @@ Core quirk worth knowing: `Magento_Sales` registers `orderGridCollectionFilterPl
 field map, which makes the column ambiguous as soon as the grid joins another table. The plugin is
 disabled for this collection only in `etc/adminhtml/di.xml`.
 
-Tests: `Test/Unit/Ui/Component/Listing/Column/PetActionsTest`.
+Tests: `Test/Unit/Ui/Component/Listing/Column/PetActionsTest`, `Test/Unit/Block/Adminhtml/Customer/PetsTabTest`.
