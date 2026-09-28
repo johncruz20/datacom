@@ -18,7 +18,8 @@
         },
         "constraint": {
             "PRIMARY": true,
-            "PAWS_PET_PROFILE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true
+            "PAWS_PET_PROFILE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "PAWS_PET_PROFILE_CUSTOMER_ID_NAME_SPECIES": true
         }
     }
 }

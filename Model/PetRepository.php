@@ -5,6 +5,7 @@ namespace PawsWhiskers\PetProfile\Model;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -47,6 +48,12 @@ class PetRepository implements PetRepositoryInterface
         try {
             /** @var Pet $pet */
             $this->resource->save($pet);
+        } catch (AlreadyExistsException $e) {
+            // Unique key hit: a concurrent request saved the same pet first.
+            throw new AlreadyExistsException(
+                __('A pet named "%1" of this species already exists for this customer.', (string)$pet->getName()),
+                $e
+            );
         } catch (\Exception $e) {
             throw new CouldNotSaveException(__('Could not save the pet profile.'), $e);
         }

@@ -21,9 +21,12 @@
         <constraint xsi:type="foreign" referenceId="PAWS_PET_PROFILE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID"
                     table="paws_pet_profile" column="customer_id"
                     referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
-        <index referenceId="PAWS_PET_PROFILE_CUSTOMER_ID" indexType="btree">
+        <!-- One pet per name and species per customer. Also serves the customer_id FK and lookups. -->
+        <constraint xsi:type="unique" referenceId="PAWS_PET_PROFILE_CUSTOMER_ID_NAME_SPECIES">
             <column name="customer_id"/>
-        </index>
+            <column name="name"/>
+            <column name="species"/>
+        </constraint>
         <index referenceId="PAWS_PET_PROFILE_SPECIES_BREED" indexType="btree">
             <column name="species"/>
             <column name="breed"/>

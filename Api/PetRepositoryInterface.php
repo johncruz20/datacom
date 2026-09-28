@@ -21,6 +21,7 @@ interface PetRepositoryInterface
      * @param \PawsWhiskers\PetProfile\Api\Data\PetInterface $pet
      * @return \PawsWhiskers\PetProfile\Api\Data\PetInterface
      * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\AlreadyExistsException on a (customer, name, species) conflict
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(PetInterface $pet): PetInterface;

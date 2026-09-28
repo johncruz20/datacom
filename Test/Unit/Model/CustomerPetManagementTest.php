@@ -5,6 +5,7 @@ namespace PawsWhiskers\PetProfile\Test\Unit\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PawsWhiskers\PetProfile\Api\Data\PetInterface;
@@ -12,6 +13,7 @@ use PawsWhiskers\PetProfile\Api\PetRepositoryInterface;
 use PawsWhiskers\PetProfile\Model\Config;
 use PawsWhiskers\PetProfile\Model\CustomerPetManagement;
 use PawsWhiskers\PetProfile\Model\ResourceModel\Pet as PetResource;
+use PawsWhiskers\PetProfile\Model\Source\Species;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -55,7 +57,8 @@ class CustomerPetManagementTest extends TestCase
             $this->petResource,
             $this->createMock(SearchCriteriaBuilder::class),
             $this->createMock(SortOrderBuilder::class),
-            $this->config
+            $this->config,
+            new Species()
         );
     }
 
@@ -64,10 +67,10 @@ class CustomerPetManagementTest extends TestCase
         $pet = $this->createPet(null, self::OTHER_CUSTOMER_ID);
         $this->petResource->method('countByCustomerId')->with(self::CUSTOMER_ID)->willReturn(3);
 
-        $pet->expects($this->once())->method('setCustomerId')->with(self::CUSTOMER_ID);
         $this->petRepository->expects($this->once())->method('save')->with($pet)->willReturn($pet);
 
         $this->assertSame($pet, $this->management->save(self::CUSTOMER_ID, $pet));
+        $this->assertSame(self::CUSTOMER_ID, $pet->getCustomerId());
     }
 
     public function testCreateIsRejectedWhenPetLimitReached(): void
@@ -90,7 +93,8 @@ class CustomerPetManagementTest extends TestCase
             $this->petResource,
             $this->createMock(SearchCriteriaBuilder::class),
             $this->createMock(SortOrderBuilder::class),
-            $config
+            $config,
+            new Species()
         );
         $pet = $this->createPet(null, null);
 
@@ -149,18 +153,81 @@ class CustomerPetManagementTest extends TestCase
         $this->assertTrue($this->management->delete(self::CUSTOMER_ID, 5));
     }
 
+    public function testCreateOfDuplicatePetIsRejected(): void
+    {
+        $this->petResource->method('countByCustomerId')->willReturn(1);
+        $this->petResource->expects($this->once())->method('hasPetNamed')
+            ->with(self::CUSTOMER_ID, 'Grasya', Species::DOG, null)
+            ->willReturn(true);
+        $this->petRepository->expects($this->never())->method('save');
+
+        $this->expectException(AlreadyExistsException::class);
+        $this->expectExceptionMessage('You already have a dog named "Grasya".');
+
+        $this->management->save(self::CUSTOMER_ID, $this->createPet(null, null, 'Grasya'));
+    }
+
+    public function testNameIsTrimmedBeforeDuplicateCheckAndSave(): void
+    {
+        $pet = $this->createPet(null, null, "  Grasya \t");
+        $this->petResource->expects($this->once())->method('hasPetNamed')
+            ->with(self::CUSTOMER_ID, 'Grasya', Species::DOG, null)
+            ->willReturn(false);
+        $this->petRepository->expects($this->once())->method('save')->willReturn($pet);
+
+        $this->management->save(self::CUSTOMER_ID, $pet);
+
+        $this->assertSame('Grasya', $pet->getName());
+    }
+
+    public function testRenameToAnotherOwnPetsNameIsRejectedButPetDoesNotMatchItself(): void
+    {
+        $pet = $this->createPet(5, self::CUSTOMER_ID, 'Tom', Species::CAT);
+        $this->petRepository->method('getById')->with(5)->willReturn($pet);
+        $this->petResource->expects($this->once())->method('hasPetNamed')
+            ->with(self::CUSTOMER_ID, 'Tom', Species::CAT, 5)
+            ->willReturn(true);
+        $this->petRepository->expects($this->never())->method('save');
+
+        $this->expectException(AlreadyExistsException::class);
+        $this->expectExceptionMessage('You already have a cat named "Tom".');
+
+        $this->management->save(self::CUSTOMER_ID, $pet);
+    }
+
     /**
-     * Create pet.
+     * Pet mock that remembers its customer ID and name, so changes made by the service are visible.
      *
      * @param int|null $petId
      * @param int|null $customerId
+     * @param string $name
+     * @param string $species
      * @return PetInterface&MockObject
      */
-    private function createPet(?int $petId, ?int $customerId): PetInterface
-    {
+    private function createPet(
+        ?int $petId,
+        ?int $customerId,
+        string $name = 'Rex',
+        string $species = Species::DOG
+    ): PetInterface {
+        $state = ['customer_id' => $customerId, 'name' => $name];
         $pet = $this->createMock(PetInterface::class);
         $pet->method('getPetId')->willReturn($petId);
-        $pet->method('getCustomerId')->willReturn($customerId);
+        $pet->method('getSpecies')->willReturn($species);
+        $pet->method('getCustomerId')->willReturnCallback(function () use (&$state) {
+            return $state['customer_id'];
+        });
+        $pet->method('setCustomerId')->willReturnCallback(function (int $id) use (&$state, &$pet) {
+            $state['customer_id'] = $id;
+            return $pet;
+        });
+        $pet->method('getName')->willReturnCallback(function () use (&$state) {
+            return $state['name'];
+        });
+        $pet->method('setName')->willReturnCallback(function (string $value) use (&$state, &$pet) {
+            $state['name'] = $value;
+            return $pet;
+        });
 
         return $pet;
     }

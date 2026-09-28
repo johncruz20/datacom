@@ -33,4 +33,31 @@ class Pet extends AbstractDb
 
         return (int)$connection->fetchOne($select);
     }
+
+    /**
+     * Whether the customer already has a pet with this name and species.
+     *
+     * Relies on the column's case-insensitive collation, so "Max" and "max" match.
+     *
+     * @param int $customerId
+     * @param string $name
+     * @param string $species
+     * @param int|null $excludePetId The pet being updated, so it doesn't match itself
+     * @return bool
+     */
+    public function hasPetNamed(int $customerId, string $name, string $species, ?int $excludePetId = null): bool
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from($this->getMainTable(), [PetInterface::PET_ID])
+            ->where(PetInterface::CUSTOMER_ID . ' = ?', $customerId)
+            ->where(PetInterface::NAME . ' = ?', $name)
+            ->where(PetInterface::SPECIES . ' = ?', $species)
+            ->limit(1);
+        if ($excludePetId !== null) {
+            $select->where(PetInterface::PET_ID . ' != ?', $excludePetId);
+        }
+
+        return (bool)$connection->fetchOne($select);
+    }
 }

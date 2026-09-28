@@ -102,8 +102,12 @@ A dedicated `paws_pet_profile` table gives:
 | `weight_kg` | decimal(6,2) unsigned, nullable | Drives size-based recommendations (food portions, crate sizes). |
 | `created_at` / `updated_at` | timestamp | `updated_at` has `ON UPDATE`; usable for incremental exports. |
 
-Indexes: `customer_id` for the customer's own list, and a composite `(species, breed)` for
-segmentation queries.
+Keys and indexes:
+- A **unique key `(customer_id, name, species)`** enforces the no-duplicates rule (section 3) even
+  under concurrent requests. Its leftmost column also serves the customer's own pet list and the
+  foreign key, so no separate `customer_id` index is needed. `name` uses the table's
+  case-insensitive collation, so "Max" and "max" count as the same name.
+- A composite `(species, breed)` index for segmentation queries.
 
 Codes are stored in lower case, while GraphQL exposes them as `UPPER_CASE` enums
 (`Model\Resolver\PetDataMapper`). The storage format and the API format can therefore change
@@ -136,6 +140,15 @@ this schema.
     the payload.
   - Reading, updating or deleting a pet that belongs to another customer throws the same
     `NoSuchEntityException` as a pet that doesn't exist, so IDs can't be enumerated.
+- **No duplicate pets.** A customer can't have two pets with the same name *and* species. Names
+  are trimmed and compared case-insensitively, so "Grasya", "grasya " and "GRASYA" all clash; a dog
+  and a cat called Max are both allowed.
+  - `CustomerPetManagement` checks this on create and on rename. A pet never matches itself, so
+    updating other fields is unaffected. The customer gets a clear error such as
+    `You already have a dog named "Grasya".` (GraphQL category `graphql-already-exists`).
+  - The unique key backs it up: if two identical requests race past the check, the second insert
+    fails, and `PetRepository` turns that into the same `AlreadyExistsException` rather than a
+    generic save error.
 - **Per-customer limit.** `paws_pet_profile/general/max_pets_per_customer` defaults to 10 in
   `etc/config.xml`. It is checked on create only, protects against abuse and bounds payload size
   for marketing profiles. Setting it to `0` disables the limit.
@@ -290,6 +303,12 @@ production. Alternatively, let `cron_consumers_runner` spawn it.
   - GraphQL resolvers require a customer token (`CustomerContext`).
   - REST `/me` routes use the `self` resource, and `customerId` is `force="true"` from
     `%customer_id%`, so a client can't send someone else's ID.
+- **GraphQL session cookies.** By default Magento also authenticates GraphQL requests from the
+  storefront session cookie (`PHPSESSID`) when there's no `Authorization` header. For a headless
+  storefront, disable that so every call needs a bearer token, which also removes the CSRF risk that
+  cookie-authenticated mutations carry:
+  `bin/magento config:set graphql/session/disable 1`.
+  This is core behaviour: the resolvers simply use whichever customer Magento authenticated.
 - **Authorisation / IDOR.** Ownership is enforced in the service layer, not the transport layer.
   Foreign pets look exactly like missing pets.
 - **Admin access.** The search API is protected by a dedicated ACL resource,
@@ -318,14 +337,15 @@ production. Alternatively, let `cron_consumers_runner` spawn it.
 
 ## 8. Testing
 
-Unit tests live in `Test/Unit` and focus on core business logic. There are 32 tests with 61
+Unit tests live in `Test/Unit` and focus on core business logic. There are 37 tests with 75
 assertions, all passing on 2.4.7 with PHPUnit 9.6.
 
 | Test | What it proves |
 |---|---|
 | `Model/PetValidatorTest` | Every validation rule (required name, length limits, closed species and gender lists, real and plausible birth dates, weight bounds), that a future birth date is rejected, and that multiple errors are reported together. |
-| `Model/CustomerPetManagementTest` | `customer_id` always comes from the authenticated customer, never the payload. The pet limit applies on create only, and a limit of `0` disables it. Reading, updating or deleting another customer's pet raises `NoSuchEntityException` and never reaches the repository's `save`/`delete`. |
+| `Model/CustomerPetManagementTest` | Duplicate name and species is rejected on create and on rename, a pet never clashes with itself, and names are trimmed before the check. `customer_id` always comes from the authenticated customer, never the payload. The pet limit applies on create only, and a limit of `0` disables it. Reading, updating or deleting another customer's pet raises `NoSuchEntityException` and never reaches the repository's `save`/`delete`. |
 | `Model/Resolver/PetDataMapperTest` | Every validation error becomes its own GraphQL error. GraphQL `UPPER_CASE` enums map to the stored codes. Updates apply only the fields sent. Output uses opaque `uid`s. |
+| `Model/PetRepositoryTest` | A unique-key violation from a racing request is reported as `AlreadyExistsException`, not as a generic save failure. |
 | `Model/Queue/SyncConsumerTest` | An upsert syncs the re-loaded current state. An upsert for a pet that was deleted is skipped quietly. A delete removes the pet without loading it. An adapter failure is logged and rethrown so the message can be retried. An unknown operation is dropped with a warning. |
 
 ```bash

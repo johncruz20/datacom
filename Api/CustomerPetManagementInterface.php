@@ -39,6 +39,8 @@ interface CustomerPetManagementInterface
      * @return \PawsWhiskers\PetProfile\Api\Data\PetInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\AlreadyExistsException when the customer already has a pet
+     *         with the same name and species
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(int $customerId, PetInterface $pet): PetInterface;

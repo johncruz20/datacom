@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace PawsWhiskers\PetProfile\Model\Resolver;
 
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlAlreadyExistsException;
 use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
@@ -40,6 +42,8 @@ class UpdatePet implements ResolverInterface
             $pet = $this->petManagement->save($customerId, $this->mapper->applyInput($pet, $args['input'] ?? []));
         } catch (NoSuchEntityException $e) {
             throw new GraphQlNoSuchEntityException(__('Could not find a pet with uid "%1".', $args['uid']), $e);
+        } catch (AlreadyExistsException $e) {
+            throw new GraphQlAlreadyExistsException(__($e->getRawMessage(), $e->getParameters()), $e);
         } catch (InputException $e) {
             throw $this->mapper->toGraphQlException($e);
         }
