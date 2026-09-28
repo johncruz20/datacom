@@ -6,6 +6,8 @@
             <module name="Magento_Customer"/>
             <module name="Magento_GraphQl"/>
             <module name="Magento_CustomerGraphQl"/>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Ui"/>
         </sequence>
     </module>
 </config>

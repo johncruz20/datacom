@@ -8,7 +8,9 @@
         "magento/framework": "103.0.*",
         "magento/framework-message-queue": "100.4.*",
         "magento/module-customer": "103.0.*",
-        "magento/module-graph-ql": "100.4.*"
+        "magento/module-graph-ql": "100.4.*",
+        "magento/module-backend": "102.0.*",
+        "magento/module-ui": "101.2.*"
     },
     "autoload": {
         "files": ["registration.php"],

@@ -381,7 +381,8 @@ Configuration (`etc/config.xml` defaults, override with `bin/magento config:set`
 
 ## 10. Out of scope / future work
 
-- Storefront UI, admin grids and forms, and `system.xml` for the settings (out of scope per the brief).
+- Storefront UI, admin forms, and `system.xml` for the settings (out of scope per the brief). A read-only
+  admin grid is on the `feature/admin-grid` branch (section 11).
 - A live Klaviyo or Braze client: HTTP client, retries with back-off, mapping to the platform's
   profile schema, and the consent check.
 - A transactional outbox and a reconciliation cron (section 5).
@@ -393,3 +394,29 @@ Configuration (`etc/config.xml` defaults, override with `bin/magento config:set`
 - Pet photos through the media gallery or a storage abstraction, with upload validation.
 - Emitting Adobe I/O Events (`Magento_AdobeIoEventsClient`) from the same commit-after hook, to reach
   other business systems through App Builder without extra Magento code.
+
+---
+
+## 11. Admin grid (optional, `feature/admin-grid` branch)
+
+The brief puts admin UI out of scope, so this is kept off `main`. The branch adds a read-only
+**Customers → Pet Profiles** grid for support and marketing staff.
+
+- **Access:** protected by the same `PawsWhiskers_PetProfile::pets` ACL resource as `/V1/pets/search`,
+  on the controller (`ADMIN_RESOURCE`), the menu item and the UI data source.
+- **UI component listing** (`paws_pet_profile_listing`) with bookmarks, column controls, filters and
+  paging. Species and gender filters are drop-downs from the same source models the validator uses.
+  Birth date and created date have date-range filters, and ID and weight have numeric ranges.
+- **Grid collection** (`Model/ResourceModel/Pet/Grid/Collection`) joins `customer_entity` for the
+  owner's email and name. Every pet column is mapped to `main_table.*`, because `customer_entity`
+  has its own `created_at` / `updated_at`.
+- **Row action:** "View Customer" opens the owner's customer page.
+- **Read-only on purpose:** pets belong to customers and are edited through the customer APIs, which
+  keeps validation, ownership and the marketing sync on a single write path.
+
+Core quirk worth knowing: `Magento_Sales` registers `orderGridCollectionFilterPlugin` on *every*
+`SearchResult` grid collection. It rewrites `created_at` filters itself and skips the collection's
+field map, which makes the column ambiguous as soon as the grid joins another table. The plugin is
+disabled for this collection only in `etc/adminhtml/di.xml`.
+
+Tests: `Test/Unit/Ui/Component/Listing/Column/PetActionsTest`.
