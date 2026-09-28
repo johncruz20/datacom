@@ -1,0 +1,17 @@
+{
+    "name": "paws-whiskers/module-pet-profile",
+    "description": "Pet Profile feature for registered customers: data layer, service contracts, GraphQL API and async marketing sync.",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "require": {
+        "php": "~8.2.0||~8.3.0",
+        "magento/framework": "103.0.*",
+        "magento/framework-message-queue": "100.4.*",
+        "magento/module-customer": "103.0.*",
+        "magento/module-graph-ql": "100.4.*"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {"PawsWhiskers\\PetProfile\\": ""}
+    }
+}

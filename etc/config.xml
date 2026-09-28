@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <paws_pet_profile>
+            <general>
+                <max_pets_per_customer>10</max_pets_per_customer>
+                <marketing_sync_enabled>1</marketing_sync_enabled>
+            </general>
+        </paws_pet_profile>
+    </default>
+</config>

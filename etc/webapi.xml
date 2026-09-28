@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Customer self-service: customer_id is forced from the token, never taken from the request. -->
+    <route url="/V1/customers/me/pets" method="GET">
+        <service class="PawsWhiskers\PetProfile\Api\CustomerPetManagementInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/customers/me/pets" method="POST">
+        <service class="PawsWhiskers\PetProfile\Api\CustomerPetManagementInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/customers/me/pets/:petId" method="DELETE">
+        <service class="PawsWhiskers\PetProfile\Api\CustomerPetManagementInterface" method="delete"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Integration / back-office access, e.g. segmentation exports. -->
+    <route url="/V1/pets/search" method="GET">
+        <service class="PawsWhiskers\PetProfile\Api\PetRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="PawsWhiskers_PetProfile::pets"/>
+        </resources>
+    </route>
+</routes>

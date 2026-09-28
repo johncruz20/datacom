@@ -1,0 +1,24 @@
+{
+    "paws_pet_profile": {
+        "column": {
+            "pet_id": true,
+            "customer_id": true,
+            "name": true,
+            "species": true,
+            "breed": true,
+            "gender": true,
+            "date_of_birth": true,
+            "weight_kg": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "PAWS_PET_PROFILE_CUSTOMER_ID": true,
+            "PAWS_PET_PROFILE_SPECIES_BREED": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "PAWS_PET_PROFILE_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true
+        }
+    }
+}

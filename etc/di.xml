@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="PawsWhiskers\PetProfile\Api\Data\PetInterface" type="PawsWhiskers\PetProfile\Model\Pet"/>
+    <preference for="PawsWhiskers\PetProfile\Api\Data\PetSearchResultsInterface"
+                type="PawsWhiskers\PetProfile\Model\PetSearchResults"/>
+    <preference for="PawsWhiskers\PetProfile\Api\Data\PetSyncMessageInterface"
+                type="PawsWhiskers\PetProfile\Model\Queue\PetSyncMessage"/>
+    <preference for="PawsWhiskers\PetProfile\Api\PetRepositoryInterface"
+                type="PawsWhiskers\PetProfile\Model\PetRepository"/>
+    <preference for="PawsWhiskers\PetProfile\Api\CustomerPetManagementInterface"
+                type="PawsWhiskers\PetProfile\Model\CustomerPetManagement"/>
+    <preference for="PawsWhiskers\PetProfile\Api\MarketingSyncInterface"
+                type="PawsWhiskers\PetProfile\Model\MarketingSync\CompositeSync"/>
+
+    <!-- Register marketing platforms here. Braze would be a second item. -->
+    <type name="PawsWhiskers\PetProfile\Model\MarketingSync\CompositeSync">
+        <arguments>
+            <argument name="adapters" xsi:type="array">
+                <item name="klaviyo" xsi:type="object">PawsWhiskers\PetProfile\Model\MarketingSync\KlaviyoAdapter</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Dedicated log file so sync activity is easy to audit and doesn't flood system.log. -->
+    <virtualType name="PawsWhiskers\PetProfile\Logger\SyncHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/pet_profile_sync.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PawsWhiskers\PetProfile\Logger\SyncLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">pet_profile_sync</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="file" xsi:type="object">PawsWhiskers\PetProfile\Logger\SyncHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="PawsWhiskers\PetProfile\Model\Queue\SyncPublisher">
+        <arguments>
+            <argument name="logger" xsi:type="object">PawsWhiskers\PetProfile\Logger\SyncLogger</argument>
+        </arguments>
+    </type>
+    <type name="PawsWhiskers\PetProfile\Model\Queue\SyncConsumer">
+        <arguments>
+            <argument name="logger" xsi:type="object">PawsWhiskers\PetProfile\Logger\SyncLogger</argument>
+        </arguments>
+    </type>
+    <type name="PawsWhiskers\PetProfile\Model\MarketingSync\KlaviyoAdapter">
+        <arguments>
+            <argument name="logger" xsi:type="object">PawsWhiskers\PetProfile\Logger\SyncLogger</argument>
+        </arguments>
+    </type>
+</config>

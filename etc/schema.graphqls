@@ -1,0 +1,67 @@
+type Customer {
+    pets: [Pet!]! @doc(description: "The customer's pet profiles.")
+        @resolver(class: "PawsWhiskers\\PetProfile\\Model\\Resolver\\CustomerPets")
+}
+
+type Mutation {
+    createPet(input: PetInput! @doc(description: "The pet to create.")): PetOutput
+        @doc(description: "Add a pet to the logged-in customer's profile.")
+        @resolver(class: "PawsWhiskers\\PetProfile\\Model\\Resolver\\CreatePet")
+    updatePet(uid: ID! @doc(description: "The pet's unique ID."), input: PetUpdateInput!): PetOutput
+        @doc(description: "Update one of the logged-in customer's pets. Omitted fields are unchanged.")
+        @resolver(class: "PawsWhiskers\\PetProfile\\Model\\Resolver\\UpdatePet")
+    deletePet(uid: ID! @doc(description: "The pet's unique ID.")): Boolean
+        @doc(description: "Delete one of the logged-in customer's pets.")
+        @resolver(class: "PawsWhiskers\\PetProfile\\Model\\Resolver\\DeletePet")
+}
+
+type Pet @doc(description: "A pet belonging to a customer.") {
+    uid: ID! @doc(description: "The unique ID for a `Pet` object.")
+    name: String!
+    species: PetSpecies!
+    breed: String
+    gender: PetGender
+    date_of_birth: String @doc(description: "Date of birth, YYYY-MM-DD.")
+    weight_kg: Float
+    created_at: String
+    updated_at: String
+}
+
+type PetOutput {
+    pet: Pet!
+}
+
+input PetInput {
+    name: String!
+    species: PetSpecies!
+    breed: String
+    gender: PetGender
+    date_of_birth: String @doc(description: "YYYY-MM-DD.")
+    weight_kg: Float
+}
+
+input PetUpdateInput @doc(description: "Fields to change. Send null to clear an optional field.") {
+    name: String
+    species: PetSpecies
+    breed: String
+    gender: PetGender
+    date_of_birth: String
+    weight_kg: Float
+}
+
+enum PetSpecies {
+    DOG
+    CAT
+    BIRD
+    FISH
+    RABBIT
+    SMALL_MAMMAL
+    REPTILE
+    OTHER
+}
+
+enum PetGender {
+    MALE
+    FEMALE
+    UNKNOWN
+}
