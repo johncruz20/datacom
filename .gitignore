@@ -1,5 +1,20 @@
+# Magento 2 module (this repo is the module root: app/code/PawsWhiskers/PetProfile)
+# Rules for a whole Magento install (pub/, var/, app/etc/env.php, ...) belong in the project's root .gitignore.
+
+# Composer: a module is installed as a package, so it doesn't ship its own dependencies or lock file
+/vendor/
+/composer.lock
+
+# Test and code-style caches
+.phpunit.result.cache
+.phpunit.cache/
+.php-cs-fixer.cache
+.php_cs.cache
+
+# OS and editor files
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
-/vendor/
-.phpunit.result.cache
+*.swp
+*~
