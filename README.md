@@ -337,7 +337,7 @@ production. Alternatively, let `cron_consumers_runner` spawn it.
 
 ## 8. Testing
 
-Unit tests live in `Test/Unit` and focus on core business logic. There are 37 tests with 75
+Unit tests live in `Test/Unit` and focus on core business logic. There are 43 tests with 92
 assertions, all passing on 2.4.7 with PHPUnit 9.6.
 
 | Test | What it proves |
