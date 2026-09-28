@@ -51,4 +51,15 @@
             <argument name="logger" xsi:type="object">PawsWhiskers\PetProfile\Logger\SyncLogger</argument>
         </arguments>
     </type>
+    <!--
+        Admin grid data source. This must live in the global di.xml: an area di.xml argument replaces the
+        global "collections" array instead of merging with it, which would unregister every core grid.
+    -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="paws_pet_profile_listing_data_source" xsi:type="string">PawsWhiskers\PetProfile\Model\ResourceModel\Pet\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

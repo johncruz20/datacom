@@ -409,7 +409,9 @@ The brief puts admin UI out of scope, so this is kept off `main`. The branch add
   Birth date and created date have date-range filters, and ID and weight have numeric ranges.
 - **Grid collection** (`Model/ResourceModel/Pet/Grid/Collection`) joins `customer_entity` for the
   owner's email and name. Every pet column is mapped to `main_table.*`, because `customer_entity`
-  has its own `created_at` / `updated_at`.
+  has its own `created_at` / `updated_at`. The data source is registered with the core
+  `CollectionFactory` in the **global** `etc/di.xml`. An area `di.xml` would replace the whole
+  `collections` array rather than merge into it, which unregisters every core admin grid.
 - **Row action:** "View Customer" opens the owner's customer page.
 - **Read-only on purpose:** pets belong to customers and are edited through the customer APIs, which
   keeps validation, ownership and the marketing sync on a single write path.
